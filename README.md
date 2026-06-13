@@ -1,0 +1,219 @@
+# CAN-Based Embedded Validation Platform using ESP32 and MCP2515
+
+## Project Goal
+
+This project builds a small automotive-style CAN validation testbed. Two ESP32 boards act like simple ECUs, and each ESP32 talks to an MCP2515 CAN controller over SPI. The MCP2515 modules send CAN frames to each other over CANH/CANL. The sender ECU transmits demo vehicle signals, and the receiver ECU decodes them, validates them, and prints PASS/FAIL results.
+
+Python scripts on the MacBook can log receiver output and generate CSV validation reports.
+
+## Hardware Used
+
+- 2x ESP32 boards
+- 2x MCP2515 CAN modules with TJA1050 transceivers
+- MacBook for `mpremote`, serial logging, and CSV reporting
+
+Confirmed ports:
+
+- Sender ECU: `/dev/cu.usbserial-0001`
+- Receiver ECU: `/dev/cu.usbserial-3`
+
+## ESP32 to MCP2515 Wiring
+
+Use this wiring on both ESP32/MCP2515 pairs:
+
+| MCP2515 | ESP32 |
+| --- | --- |
+| VCC | 5V |
+| GND | GND |
+| CS | GPIO 5 |
+| SCK | GPIO 18 |
+| SI / MOSI | GPIO 23 |
+| SO / MISO | GPIO 19 |
+| INT | GPIO 4 |
+
+## CAN Bus Wiring
+
+| MCP2515 #1 | MCP2515 #2 |
+| --- | --- |
+| CANH | CANH |
+| CANL | CANL |
+| GND | GND, recommended |
+
+Both MCP2515 boards currently have the J1 termination jumper ON.
+
+## Required Files
+
+- `mcp2515_test.py` - ESP32 MicroPython SPI communication test
+- `can_loopback_test.py` - ESP32 MicroPython single-node MCP2515 loopback test
+- `sender_node.py` - ESP32 MicroPython sender ECU
+- `receiver_node.py` - ESP32 MicroPython receiver ECU and validator
+- `can_test_suite.py` - Mac Python serial validation runner
+- `speed_validator.py` - Mac Python validation rules
+- `logger.py` - Mac Python raw serial CSV logger
+- `README.md` - project documentation
+
+## Run Commands
+
+SPI test on sender:
+
+```sh
+~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run mcp2515_test.py
+```
+
+SPI test on receiver:
+
+```sh
+~/.local/bin/mpremote connect /dev/cu.usbserial-3 run mcp2515_test.py
+```
+
+Loopback test on one ESP32/MCP2515 node:
+
+```sh
+~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run can_loopback_test.py
+```
+
+Run the receiver first:
+
+```sh
+~/.local/bin/mpremote connect /dev/cu.usbserial-3 run receiver_node.py
+```
+
+Then run the sender in another terminal:
+
+```sh
+~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run sender_node.py
+```
+
+Important serial-port rule: only one program can read `/dev/cu.usbserial-3` at a time. If `mpremote connect /dev/cu.usbserial-3 run receiver_node.py` is still open, `python3 logger.py` and `python3 can_test_suite.py` cannot also read that receiver port.
+
+For quick manual testing, use two terminals:
+
+1. Receiver terminal with `mpremote` on `/dev/cu.usbserial-3`
+2. Sender terminal with `mpremote` on `/dev/cu.usbserial-0001`
+
+For Mac CSV logging, first copy the receiver code onto the receiver ESP32 as `main.py`, then disconnect `mpremote` so Python can own the serial port:
+
+```sh
+~/.local/bin/mpremote connect /dev/cu.usbserial-3 cp receiver_node.py :main.py
+```
+
+After copying, unplug/replug or press reset on the receiver ESP32. Do not keep `mpremote` connected to `/dev/cu.usbserial-3`.
+
+Then run the Mac CSV test suite:
+
+```sh
+python3 can_test_suite.py
+```
+
+Or run the raw serial logger:
+
+```sh
+python3 logger.py
+```
+
+Generate graphical report files from the CSV:
+
+```sh
+python3 generate_can_report.py
+```
+
+This creates `can_validation_report.html` and `can_validation_results_with_thresholds.csv`. If `matplotlib` is installed, it also creates `can_validation_report.pdf`.
+
+Start the sender in another terminal:
+
+```sh
+~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run sender_node.py
+```
+
+## Expected Receiver Output
+
+The sender transmits speed values first, so the receiver should begin with lines like:
+
+```text
+Received ID: 0x100 | Speed: 40 | Warning: OFF | PASS
+Received ID: 0x100 | Speed: 80 | Warning: ON | PASS
+Received ID: 0x100 | Speed: 255 | Warning: ON | FAIL
+```
+
+After that it also sends RPM, battery voltage, brake status, and coolant temperature demo frames.
+
+If the receiver prints a status line like this:
+
+```text
+Ignored non-demo frames: 25 | EFLG: 0x0 | TEC: 0 | REC: 0
+```
+
+it means the MCP2515 receive flag was set, but the frame did not match this demo platform's expected one-byte standard IDs. If `REC` is rising or large, such as `REC: 135`, the receiver is seeing CAN receive errors. Recheck that the two modules share GND, CANH goes to CANH, CANL goes to CANL, both nodes use the same bit timing, and both MCP2515 boards use the same crystal frequency. Loopback passing proves SPI and MCP2515 register access, but it does not prove the CANH/CANL physical link.
+
+## CAN Signal Map
+
+These CAN IDs are example mappings for this validation platform. Real vehicle CAN IDs are defined by the OEM or supplier and are normally documented in a DBC file.
+
+| CAN ID | Signal |
+| --- | --- |
+| `0x100` | Vehicle Speed |
+| `0x200` | Engine RPM |
+| `0x300` | Battery Voltage |
+| `0x400` | Brake Status |
+| `0x500` | Coolant Temperature |
+
+## Validation Rules
+
+The receiver checks every CAN message against simple threshold rules. A threshold is the limit where a value changes from valid to invalid, or where a warning turns on.
+
+| Signal | CAN ID | PASS range/value | Warning rule | FAIL condition | Example PASS | Example FAIL |
+| --- | --- | --- | --- | --- | --- | --- |
+| Vehicle Speed | `0x100` | `0` to `250` | Warning ON if speed is above `50`; Warning OFF if speed is `50` or below | Speed below `0` or above `250`; in this demo `255` is the fault value | `40`, `80` | `255` |
+| Engine RPM | `0x200` | `0` to `200` | Not used | RPM above `200` | `120` | `250` |
+| Battery Voltage | `0x300` | `10` to `15` | Not used | Voltage below `10` or above `15` | `12` | `9` |
+| Brake Status | `0x400` | `0` or `1` only | Not used | Any value other than `0` or `1` | `1` | `3` |
+| Coolant Temperature | `0x500` | `70` to `110` | Not used | Temperature below `70` or above `110` | `90` | `130` |
+
+Plain-English meaning:
+
+- Vehicle speed `40` passes because it is inside `0` to `250`, and warning is OFF because it is not above `50`.
+- Vehicle speed `80` passes because it is inside `0` to `250`, but warning is ON because it is above `50`.
+- Vehicle speed `255` fails because it is above the maximum valid speed of `250`.
+- RPM `120` passes, but RPM `250` fails because this demo allows only up to `200`.
+- Battery `12` passes, but battery `9` fails because it is below `10`.
+- Brake `1` passes because it means pressed; brake `3` fails because only `0` and `1` are allowed.
+- Coolant `90` passes, but coolant `130` fails because it is above `110`.
+
+When the Python test suite prints `suite: PASS`, it means the receiver made the correct decision. For example, `receiver: FAIL | expected: FAIL | suite: PASS` is a good result because the injected bad value was correctly detected.
+
+## MCP2515 Register Notes
+
+- `CANCTRL` is the MCP2515 control register. The ESP32 writes this register to request configuration, loopback, or normal mode.
+- `CANSTAT` is the MCP2515 status register. It reports the current operating mode.
+- `CANINTF` contains interrupt flags. For example, `RX0IF` means a message arrived in receive buffer 0.
+- `DLC` means Data Length Code. It tells how many data bytes are in the CAN frame.
+- The CAN ID identifies the message type and also participates in bus arbitration.
+- Lower CAN IDs have higher priority during arbitration.
+
+Useful mode values:
+
+- `CANCTRL = 0x40` and `CANSTAT = 0x40` means loopback mode.
+- `CANCTRL = 0x00` and `CANSTAT = 0x00` means normal mode.
+- After reset, `CANSTAT = 0x80` and `CANCTRL` often reads around `0x87`, which means configuration mode.
+
+## Loopback Mode
+
+Loopback mode is a single-node self-test inside the MCP2515. The ESP32 sends a CAN frame into the MCP2515 transmit buffer, and the MCP2515 internally routes that frame back into its receive buffer. This proves the ESP32 SPI connection, MCP2515 register setup, CAN ID packing, DLC, data bytes, and basic transmit/receive logic work.
+
+Loopback mode does not prove the physical CANH/CANL bus or the second MCP2515 module.
+
+## Real Two-Node CAN Communication
+
+Real two-node communication uses both ESP32/MCP2515 nodes. The sender MCP2515 drives the CANH/CANL bus through its TJA1050 transceiver. The receiver MCP2515 reads the physical CAN bus through its own TJA1050 transceiver and passes the decoded frame to the receiver ESP32 over SPI.
+
+This proves the physical CAN wiring, termination, transceivers, normal mode configuration, and ECU-to-ECU communication path.
+
+## Validation and Fault Injection
+
+Validation means the receiver checks each decoded CAN signal against an expected rule. If the value is inside the valid range, the result is PASS. If the value is outside the valid range, the result is FAIL.
+
+Fault injection means intentionally sending bad values to prove the validator detects failures. In this project, speed `255`, RPM `250`, battery voltage `9`, brake status `3`, and coolant temperature `130` are example fault-injection values.
+
+## CV Description
+
+Developed a CAN-based embedded validation platform using ESP32 and MCP2515 modules. Implemented SPI communication, CAN frame transmission/reception, ECU-to-ECU communication, loopback testing, fault injection, signal validation, and Python-based PASS/FAIL reporting.

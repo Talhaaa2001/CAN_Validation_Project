@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CAN Validation Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #0f172a; margin: 32px; }
+    h1, h2 { margin: 0 0 14px; }
+    .page { min-height: 950px; page-break-after: always; }
+    .summary { display: flex; gap: 16px; margin: 18px 0; }
+    .metric { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; }
+    .metric strong { display: block; font-size: 26px; }
+    .chart { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin: 16px 0; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #e2e8f0; }
+    .note { color: #475569; font-size: 13px; }
+    @media print { body { margin: 18mm; } .page { page-break-after: always; } }
+  </style>
+</head>
+<body>
+  <section class="page">
+    <h1>CAN Validation Report</h1>
+    <p class="note">Source CSV: can_validation_results.csv</p>
+    <div class="summary">
+      <div class="metric"><span>Total frames</span><strong>30</strong></div>
+      <div class="metric"><span>Suite PASS</span><strong>30</strong></div>
+      <div class="metric"><span>Suite FAIL</span><strong>0</strong></div>
+    </div>
+    <h2>Graph 1: Receiver PASS/FAIL Counts</h2>
+    <div class="chart"><svg viewBox="0 0 920 340" role="img" aria-label="Pass and fail counts by signal">
+<line x1="160" y1="20" x2="160" y2="290" stroke="#334155" />
+<text x="10" y="51.0" font-size="13" fill="#0f172a">Vehicle Speed</text>
+<rect x="160" y="35.0" width="480.0" height="18" fill="#16a34a" />
+<rect x="160" y="57.0" width="240.0" height="18" fill="#dc2626" />
+<text x="648.0" y="49.0" font-size="12" fill="#0f172a">PASS 6</text>
+<text x="408.0" y="71.0" font-size="12" fill="#0f172a">FAIL 3</text>
+<text x="10" y="97.0" font-size="13" fill="#0f172a">Engine RPM</text>
+<rect x="160" y="81.0" width="240.0" height="18" fill="#16a34a" />
+<rect x="160" y="103.0" width="240.0" height="18" fill="#dc2626" />
+<text x="408.0" y="95.0" font-size="12" fill="#0f172a">PASS 3</text>
+<text x="408.0" y="117.0" font-size="12" fill="#0f172a">FAIL 3</text>
+<text x="10" y="143.0" font-size="13" fill="#0f172a">Battery Voltage</text>
+<rect x="160" y="127.0" width="240.0" height="18" fill="#16a34a" />
+<rect x="160" y="149.0" width="240.0" height="18" fill="#dc2626" />
+<text x="408.0" y="141.0" font-size="12" fill="#0f172a">PASS 3</text>
+<text x="408.0" y="163.0" font-size="12" fill="#0f172a">FAIL 3</text>
+<text x="10" y="189.0" font-size="13" fill="#0f172a">Brake Status</text>
+<rect x="160" y="173.0" width="240.0" height="18" fill="#16a34a" />
+<rect x="160" y="195.0" width="160.0" height="18" fill="#dc2626" />
+<text x="408.0" y="187.0" font-size="12" fill="#0f172a">PASS 3</text>
+<text x="328.0" y="209.0" font-size="12" fill="#0f172a">FAIL 2</text>
+<text x="10" y="235.0" font-size="13" fill="#0f172a">Coolant Temperature</text>
+<rect x="160" y="219.0" width="160.0" height="18" fill="#16a34a" />
+<rect x="160" y="241.0" width="160.0" height="18" fill="#dc2626" />
+<text x="328.0" y="233.0" font-size="12" fill="#0f172a">PASS 2</text>
+<text x="328.0" y="255.0" font-size="12" fill="#0f172a">FAIL 2</text>
+</svg></div>
+    <h2>Graph 2: Observed Signal Values</h2>
+    <div class="chart"><svg viewBox="0 0 920 420" role="img" aria-label="Observed values by signal">
+<text x="10" y="40" font-size="13" fill="#0f172a">Vehicle Speed</text>
+<line x1="160" y1="35" x2="890" y2="35" stroke="#cbd5e1" />
+<circle cx="272.9" cy="22.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="279.9" y="26.0" font-size="10" fill="#475569">40</text>
+<circle cx="385.9" cy="35.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="392.9" y="39.0" font-size="10" fill="#475569">80</text>
+<circle cx="880.0" cy="48.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="887.0" y="52.0" font-size="10" fill="#475569">255</text>
+<circle cx="272.9" cy="22.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="279.9" y="26.0" font-size="10" fill="#475569">40</text>
+<circle cx="385.9" cy="35.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="392.9" y="39.0" font-size="10" fill="#475569">80</text>
+<circle cx="880.0" cy="48.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="887.0" y="52.0" font-size="10" fill="#475569">255</text>
+<circle cx="272.9" cy="22.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="279.9" y="26.0" font-size="10" fill="#475569">40</text>
+<circle cx="385.9" cy="35.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="392.9" y="39.0" font-size="10" fill="#475569">80</text>
+<circle cx="880.0" cy="48.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="887.0" y="52.0" font-size="10" fill="#475569">255</text>
+<text x="10" y="108" font-size="13" fill="#0f172a">Engine RPM</text>
+<line x1="160" y1="103" x2="890" y2="103" stroke="#cbd5e1" />
+<circle cx="498.8" cy="90.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="505.8" y="94.0" font-size="10" fill="#475569">120</text>
+<circle cx="865.9" cy="103.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="872.9" y="107.0" font-size="10" fill="#475569">250</text>
+<circle cx="498.8" cy="116.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="505.8" y="120.0" font-size="10" fill="#475569">120</text>
+<circle cx="865.9" cy="90.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="872.9" y="94.0" font-size="10" fill="#475569">250</text>
+<circle cx="498.8" cy="103.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="505.8" y="107.0" font-size="10" fill="#475569">120</text>
+<circle cx="865.9" cy="116.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="872.9" y="120.0" font-size="10" fill="#475569">250</text>
+<text x="10" y="176" font-size="13" fill="#0f172a">Battery Voltage</text>
+<line x1="160" y1="171" x2="890" y2="171" stroke="#cbd5e1" />
+<circle cx="193.9" cy="158.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="200.9" y="162.0" font-size="10" fill="#475569">12</text>
+<circle cx="185.4" cy="171.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="192.4" y="175.0" font-size="10" fill="#475569">9</text>
+<circle cx="193.9" cy="184.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="200.9" y="188.0" font-size="10" fill="#475569">12</text>
+<circle cx="185.4" cy="158.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="192.4" y="162.0" font-size="10" fill="#475569">9</text>
+<circle cx="193.9" cy="171.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="200.9" y="175.0" font-size="10" fill="#475569">12</text>
+<circle cx="185.4" cy="184.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="192.4" y="188.0" font-size="10" fill="#475569">9</text>
+<text x="10" y="244" font-size="13" fill="#0f172a">Brake Status</text>
+<line x1="160" y1="239" x2="890" y2="239" stroke="#cbd5e1" />
+<circle cx="162.8" cy="226.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="169.8" y="230.0" font-size="10" fill="#475569">1</text>
+<circle cx="168.5" cy="239.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="175.5" y="243.0" font-size="10" fill="#475569">3</text>
+<circle cx="162.8" cy="252.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="169.8" y="256.0" font-size="10" fill="#475569">1</text>
+<circle cx="168.5" cy="226.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="175.5" y="230.0" font-size="10" fill="#475569">3</text>
+<circle cx="162.8" cy="239.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="169.8" y="243.0" font-size="10" fill="#475569">1</text>
+<text x="10" y="312" font-size="13" fill="#0f172a">Coolant Temperature</text>
+<line x1="160" y1="307" x2="890" y2="307" stroke="#cbd5e1" />
+<circle cx="414.1" cy="294.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="421.1" y="298.0" font-size="10" fill="#475569">90</text>
+<circle cx="527.1" cy="307.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="534.1" y="311.0" font-size="10" fill="#475569">130</text>
+<circle cx="414.1" cy="320.0" r="5" fill="#16a34a" opacity="0.8" />
+<text x="421.1" y="324.0" font-size="10" fill="#475569">90</text>
+<circle cx="527.1" cy="294.0" r="5" fill="#dc2626" opacity="0.8" />
+<text x="534.1" y="298.0" font-size="10" fill="#475569">130</text>
+</svg></div>
+  </section>
+
+  <section class="page">
+    <h1>Page 2: Threshold Table</h1>
+    <p class="note">This table is also written into can_validation_results_with_thresholds.csv.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>CAN ID</th>
+          <th>Signal</th>
+          <th>PASS threshold</th>
+          <th>Warning threshold</th>
+          <th>FAIL threshold</th>
+          <th>Example PASS</th>
+          <th>Example FAIL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>0x100</td><td>Vehicle Speed</td><td>0 &lt;= speed &lt;= 250</td><td>Warning ON if speed &gt; 50</td><td>speed &lt; 0 or speed &gt; 250</td><td>40, 80</td><td>255</td></tr>
+<tr><td>0x200</td><td>Engine RPM</td><td>0 &lt;= rpm &lt;= 200</td><td>N/A</td><td>rpm &gt; 200</td><td>120</td><td>250</td></tr>
+<tr><td>0x300</td><td>Battery Voltage</td><td>10 &lt;= voltage &lt;= 15</td><td>N/A</td><td>voltage &lt; 10 or voltage &gt; 15</td><td>12</td><td>9</td></tr>
+<tr><td>0x400</td><td>Brake Status</td><td>brake is 0 or 1</td><td>N/A</td><td>brake is not 0 or 1</td><td>1</td><td>3</td></tr>
+<tr><td>0x500</td><td>Coolant Temperature</td><td>70 &lt;= temp &lt;= 110</td><td>N/A</td><td>temp &lt; 70 or temp &gt; 110</td><td>90</td><td>130</td></tr>
+      </tbody>
+    </table>
+  </section>
+</body>
+</html>
