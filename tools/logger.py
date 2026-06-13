@@ -1,4 +1,5 @@
 import csv
+import os
 from datetime import datetime
 
 import serial
@@ -6,11 +7,12 @@ from serial import SerialException
 
 RECEIVER_PORT = "/dev/cu.usbserial-3"
 BAUDRATE = 115200
-OUTPUT_FILE = "can_validation_results.csv"
+OUTPUT_FILE = "results/can_validation_results.csv"
 
 
 def main():
     try:
+        os.makedirs("results", exist_ok=True)
         # This script records every line printed by the receiver ESP32.
         ser = serial.Serial(RECEIVER_PORT, BAUDRATE, timeout=1)
 

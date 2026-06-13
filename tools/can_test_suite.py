@@ -1,4 +1,5 @@
 import csv
+import os
 from datetime import datetime
 
 import serial
@@ -8,7 +9,7 @@ from speed_validator import get_threshold, validate_signal
 
 RECEIVER_PORT = "/dev/cu.usbserial-3"
 BAUDRATE = 115200
-OUTPUT_FILE = "can_validation_results.csv"
+OUTPUT_FILE = "results/can_validation_results.csv"
 MAX_FRAMES = 30
 
 
@@ -35,6 +36,7 @@ def parse_receiver_line(line):
 
 def main():
     try:
+        os.makedirs("results", exist_ok=True)
         ser = serial.Serial(RECEIVER_PORT, BAUDRATE, timeout=1)
 
         with open(OUTPUT_FILE, "w", newline="") as file:

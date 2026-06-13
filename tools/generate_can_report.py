@@ -1,13 +1,15 @@
 import csv
+import os
 from collections import Counter, defaultdict
 from html import escape
 
 from speed_validator import get_threshold
 
-INPUT_FILE = "can_validation_results.csv"
-ENRICHED_CSV = "can_validation_results_with_thresholds.csv"
-HTML_REPORT = "can_validation_report.html"
-PDF_REPORT = "can_validation_report.pdf"
+RESULTS_DIR = "results"
+INPUT_FILE = os.path.join(RESULTS_DIR, "can_validation_results.csv")
+ENRICHED_CSV = os.path.join(RESULTS_DIR, "can_validation_results_with_thresholds.csv")
+HTML_REPORT = os.path.join(RESULTS_DIR, "can_validation_report.html")
+PDF_REPORT = os.path.join(RESULTS_DIR, "can_validation_report.pdf")
 
 
 def read_rows(path):
@@ -318,6 +320,7 @@ def try_make_matplotlib_pdf(rows):
 
 
 def main():
+    os.makedirs(RESULTS_DIR, exist_ok=True)
     rows = read_rows(INPUT_FILE)
     if not rows:
         print("No rows found in", INPUT_FILE)

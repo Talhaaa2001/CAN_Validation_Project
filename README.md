@@ -41,50 +41,65 @@ Use this wiring on both ESP32/MCP2515 pairs:
 
 Both MCP2515 boards currently have the J1 termination jumper ON.
 
-## Required Files
+## Project Structure
 
-- `mcp2515_test.py` - ESP32 MicroPython SPI communication test
-- `can_loopback_test.py` - ESP32 MicroPython single-node MCP2515 loopback test
-- `sender_node.py` - ESP32 MicroPython sender ECU
-- `receiver_node.py` - ESP32 MicroPython receiver ECU and validator
-- `can_test_suite.py` - Mac Python serial validation runner
-- `speed_validator.py` - Mac Python validation rules
-- `logger.py` - Mac Python raw serial CSV logger
-- `README.md` - project documentation
+```text
+CAN_Validation_Project/
+├── esp32/
+│   ├── mcp2515_test.py        # ESP32 MicroPython SPI test
+│   ├── can_loopback_test.py   # ESP32 MicroPython loopback test
+│   ├── sender_node.py         # ESP32 sender ECU
+│   └── receiver_node.py       # ESP32 receiver ECU and validator
+├── tools/
+│   ├── can_test_suite.py      # Mac Python serial validation runner
+│   ├── speed_validator.py     # Mac Python validation rules and thresholds
+│   ├── logger.py              # Mac Python raw serial CSV logger
+│   ├── generate_can_report.py # Graphical HTML/PDF report generator
+│   └── check_esp_ports.py     # Mac Python ESP32 port checker
+├── diagnostics/
+│   ├── mcp2515_status.py      # ESP32 MCP2515 register/status reader
+│   └── can_bus_diagnostic.py  # ESP32 listen-only CAN bus diagnostic
+├── results/
+│   ├── can_validation_results.csv
+│   ├── can_validation_results_with_thresholds.csv
+│   ├── can_validation_report.html
+│   └── can_validation_report.pdf
+└── README.md
+```
 
 ## Run Commands
 
 SPI test on sender:
 
 ```sh
-~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run mcp2515_test.py
+~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run esp32/mcp2515_test.py
 ```
 
 SPI test on receiver:
 
 ```sh
-~/.local/bin/mpremote connect /dev/cu.usbserial-3 run mcp2515_test.py
+~/.local/bin/mpremote connect /dev/cu.usbserial-3 run esp32/mcp2515_test.py
 ```
 
 Loopback test on one ESP32/MCP2515 node:
 
 ```sh
-~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run can_loopback_test.py
+~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run esp32/can_loopback_test.py
 ```
 
 Run the receiver first:
 
 ```sh
-~/.local/bin/mpremote connect /dev/cu.usbserial-3 run receiver_node.py
+~/.local/bin/mpremote connect /dev/cu.usbserial-3 run esp32/receiver_node.py
 ```
 
 Then run the sender in another terminal:
 
 ```sh
-~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run sender_node.py
+~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run esp32/sender_node.py
 ```
 
-Important serial-port rule: only one program can read `/dev/cu.usbserial-3` at a time. If `mpremote connect /dev/cu.usbserial-3 run receiver_node.py` is still open, `python3 logger.py` and `python3 can_test_suite.py` cannot also read that receiver port.
+Important serial-port rule: only one program can read `/dev/cu.usbserial-3` at a time. If `mpremote connect /dev/cu.usbserial-3 run esp32/receiver_node.py` is still open, `python3 tools/logger.py` and `python3 tools/can_test_suite.py` cannot also read that receiver port.
 
 For quick manual testing, use two terminals:
 
@@ -94,7 +109,7 @@ For quick manual testing, use two terminals:
 For Mac CSV logging, first copy the receiver code onto the receiver ESP32 as `main.py`, then disconnect `mpremote` so Python can own the serial port:
 
 ```sh
-~/.local/bin/mpremote connect /dev/cu.usbserial-3 cp receiver_node.py :main.py
+~/.local/bin/mpremote connect /dev/cu.usbserial-3 cp esp32/receiver_node.py :main.py
 ```
 
 After copying, unplug/replug or press reset on the receiver ESP32. Do not keep `mpremote` connected to `/dev/cu.usbserial-3`.
@@ -102,27 +117,27 @@ After copying, unplug/replug or press reset on the receiver ESP32. Do not keep `
 Then run the Mac CSV test suite:
 
 ```sh
-python3 can_test_suite.py
+python3 tools/can_test_suite.py
 ```
 
 Or run the raw serial logger:
 
 ```sh
-python3 logger.py
+python3 tools/logger.py
 ```
 
 Generate graphical report files from the CSV:
 
 ```sh
-python3 generate_can_report.py
+python3 tools/generate_can_report.py
 ```
 
-This creates `can_validation_report.html` and `can_validation_results_with_thresholds.csv`. If `matplotlib` is installed, it also creates `can_validation_report.pdf`.
+This creates `results/can_validation_report.html` and `results/can_validation_results_with_thresholds.csv`. If `matplotlib` is installed, it also creates `results/can_validation_report.pdf`.
 
 Start the sender in another terminal:
 
 ```sh
-~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run sender_node.py
+~/.local/bin/mpremote connect /dev/cu.usbserial-0001 run esp32/sender_node.py
 ```
 
 ## Expected Receiver Output
