@@ -291,24 +291,3 @@ The generated file `results/savvycan_frames.csv` is useful for reviewing the fra
 Validation means the receiver checks each decoded CAN signal against an expected rule. If the value is inside the valid range, the result is PASS. If the value is outside the valid range, the result is FAIL.
 
 Fault injection means intentionally sending bad values to prove the validator detects failures. In this project, speed `255`, RPM `250`, battery voltage `9`, brake status `3`, and coolant temperature `130` are example fault-injection values.
-
-## CV Description
-
-Developed a CAN-based embedded validation platform using ESP32, MCP2515 modules, OLED display feedback, SavvyCAN, and a USB-to-CAN adapter. Implemented SPI communication, CAN frame transmission/reception, ECU-to-ECU communication, loopback testing, fault injection, signal validation, OLED status display, CSV/PDF reporting, and USB-to-CAN replay/simulation workflows.
-
-## Updating GitHub
-
-After editing the project, push changes to GitHub with:
-
-```sh
-git status
-git add .
-git commit -m "Update OLED and USB-to-CAN simulation workflow"
-git push origin main
-```
-
-Check the GitHub repo after pushing:
-
-```text
-https://github.com/Talhaaa2001/CAN_Validation_Project
-```

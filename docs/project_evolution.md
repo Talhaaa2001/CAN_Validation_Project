@@ -2,6 +2,10 @@
 
 This project was developed in stages. The file and folder names in the current repository use the final organized structure, while the project history explains how the scope grew.
 
+## Project Summary
+
+Developed a CAN-based embedded validation platform using ESP32, MCP2515 modules, OLED display feedback, SavvyCAN, and a USB-to-CAN adapter. Implemented SPI communication, CAN frame transmission/reception, ECU-to-ECU communication, loopback testing, fault injection, signal validation, OLED status display, CSV/PDF reporting, and USB-to-CAN replay/simulation workflows.
+
 ## Stage 1: Basic CAN Bring-Up
 
 The first version focused on proving the ESP32 could communicate with the MCP2515 over SPI.
