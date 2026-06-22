@@ -1,4 +1,4 @@
-from machine import Pin, SPI
+from machine import I2C, Pin, SPI
 import time
 
 CMD_RESET = 0xC0
@@ -28,6 +28,13 @@ REG_RXB1D0 = 0x76
 
 MODE_NORMAL = 0x00
 
+OLED_ENABLED = True
+OLED_WIDTH = 128
+OLED_HEIGHT = 64
+OLED_SDA_PIN = 21
+OLED_SCL_PIN = 22
+OLED_I2C_ADDR = 0x3C
+
 CAN_ID_SPEED = 0x100
 CAN_ID_RPM = 0x200
 CAN_ID_BATTERY = 0x300
@@ -54,6 +61,8 @@ spi = SPI(
     mosi=Pin(23),
     miso=Pin(19),
 )
+
+oled = None
 
 
 def command(value):
@@ -109,6 +118,51 @@ def setup_can():
     set_mode(MODE_NORMAL)
     print("CANCTRL:", hex(read_register(REG_CANCTRL)))
     print("CANSTAT:", hex(read_register(REG_CANSTAT)))
+
+
+def setup_oled():
+    global oled
+
+    if not OLED_ENABLED:
+        return
+
+    try:
+        from ssd1306 import SSD1306_I2C
+
+        i2c = I2C(
+            0,
+            scl=Pin(OLED_SCL_PIN),
+            sda=Pin(OLED_SDA_PIN),
+            freq=400000,
+        )
+        oled = SSD1306_I2C(OLED_WIDTH, OLED_HEIGHT, i2c, addr=OLED_I2C_ADDR)
+        oled.fill(0)
+        oled.text("CAN Receiver", 0, 0)
+        oled.text("Waiting...", 0, 16)
+        oled.show()
+        print("OLED display ready")
+    except Exception as exc:
+        oled = None
+        print("OLED not available:", exc)
+
+
+def update_oled(can_id, signal, value, warning, result):
+    if oled is None:
+        return
+
+    oled.fill(0)
+    oled.text("CAN Validation", 0, 0)
+    oled.hline(0, 10, OLED_WIDTH, 1)
+    oled.text("ID " + hex(can_id), 0, 16)
+    oled.text(signal + ":" + str(value), 0, 28)
+
+    if warning != "N/A":
+        oled.text("Warn:" + warning, 0, 40)
+    else:
+        oled.text("Warn:N/A", 0, 40)
+
+    oled.text(result, 0, 52)
+    oled.show()
 
 
 def read_rx_buffer(base_register):
@@ -174,6 +228,7 @@ def print_result(can_id, signal, value, warning, result):
 
 
 print("Receiver ECU started")
+setup_oled()
 setup_can()
 
 ignored_frames = 0
@@ -194,6 +249,7 @@ while True:
         ):
             signal, warning, result = validate_frame(rx_id, value)
             print_result(rx_id, signal, value, warning, result)
+            update_oled(rx_id, signal, value, warning, result)
         else:
             ignored_frames += 1
 
@@ -210,6 +266,7 @@ while True:
         ):
             signal, warning, result = validate_frame(rx_id, value)
             print_result(rx_id, signal, value, warning, result)
+            update_oled(rx_id, signal, value, warning, result)
         else:
             ignored_frames += 1
 
