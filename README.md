@@ -75,6 +75,8 @@ CAN_Validation_Project/
 ├── diagnostics/
 │   ├── mcp2515_status.py      # ESP32 MCP2515 register/status reader
 │   └── can_bus_diagnostic.py  # ESP32 listen-only CAN bus diagnostic
+├── docs/
+│   └── project_evolution.md   # How the project grew over time
 ├── results/
 │   ├── can_validation_results.csv
 │   ├── can_validation_results_with_thresholds.csv
@@ -89,6 +91,8 @@ Install Mac Python dependencies:
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
+
+See `docs/project_evolution.md` for a short explanation of how the project grew from basic MCP2515 testing into OLED display support and SavvyCAN/USB-to-CAN simulation.
 
 ## Run Commands
 
